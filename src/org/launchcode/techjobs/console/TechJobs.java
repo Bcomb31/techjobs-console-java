@@ -2,6 +2,7 @@ package org.launchcode.techjobs.console;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -61,7 +62,7 @@ public class TechJobs {
                 String searchTerm = in.nextLine();
 
                 if (searchField.equals("all")) {
-                    System.out.println("Search all fields not yet implemented.");
+                    printJobs(JobData.findByValue(searchTerm));
                 } else {
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
                 }
@@ -89,11 +90,12 @@ public class TechJobs {
             System.out.println("\n" + menuHeader);
 
             // Print available choices
-            for (Integer j = 0; j < choiceKeys.length; j++) {
+            Integer j;
+            for (j=0; j < choiceKeys.length; j++) {
                 System.out.println("" + j + " - " + choices.get(choiceKeys[j]));
             }
 
-            choiceIdx = in.nextInt();
+            choiceIdx=in.nextInt();
             in.nextLine();
 
             // Validate user's input
@@ -107,10 +109,24 @@ public class TechJobs {
 
         return choiceKeys[choiceIdx];
     }
-
     // Print a list of jobs
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
-
-        System.out.println("printJobs is not implemented yet");
+        if (someJobs.size() > 0) {
+            // Here, we loop through the ArrayList of HashMaps. Each HashMap represents one job. The keys are job property names, the values the actual
+            // property
+            for (HashMap<String, String> oneJob : someJobs) {
+                //Print a starting separator
+                System.out.println("*****");
+                //Loop through the entries in the HashMap and print out the Job Property Name (key) and the actual Property (value
+                for (Map.Entry<String, String> jobProps : oneJob.entrySet()) {
+                    System.out.println(jobProps.getKey() + ": " + jobProps.getValue());
+                }
+                //Print an ending separator
+                System.out.println("*****");
+            }
+        } else {
+            //If there are no jobs in the ArrayList, print a message saying so.
+            System.out.println("There are no results fitting this description.");
+        }
     }
 }

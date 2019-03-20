@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LaunchCode
@@ -50,11 +51,12 @@ public class JobData {
 
         // load data, if not already loaded
         loadData();
-
-        return allJobs;
+        ArrayList<HashMap<String, String>> copyAllJobs = new
+                ArrayList<>(allJobs);
+        return copyAllJobs;
     }
 
-    /**
+    /*
      * Returns results of search the jobs data by key/value, using
      * inclusion of the search term.
      *
@@ -62,28 +64,68 @@ public class JobData {
      * with "Enterprise Holdings, Inc".
      *
      * @param column   Column that should be searched.
-     * @param value Value of teh field to search for
+     * @param value Value of the field to search for (all lower case)
      * @return List of all jobs matching the criteria
      */
     public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
 
         // load data, if not already loaded
         loadData();
+        //force our search term value to ber lowercase, so we can force case-insensitivity;
+        value = value.toLowerCase();
 
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
 
         for (HashMap<String, String> row : allJobs) {
 
             String aValue = row.get(column);
-
-            if (aValue.contains(value)) {
+            //We lowercase the values of the properties to force case insensitivity.
+            if (aValue.toLowerCase().contains(value)) {
                 jobs.add(row);
             }
         }
 
         return jobs;
     }
+    /*
+     * Returns results of search the jobs data by using
+     * inclusion of the search term.
+     *
+     * For example, searching for "web" will include results
+     * with position type "Web - Front End" or name "Front end web dev."
+     * Note that each job will only be included at the most one time.
+     *
+     * @param value Value of the field to search for (all lower case)
+     * @return List of all jobs matching the criteria
+     */
 
+    public static ArrayList<HashMap<String, String>> findByValue(String value) {
+        // load data, if not already loaded
+        loadData();
+        //force our search term value to ber lowercase, so we can force case-insensitivity;
+        value = value.toLowerCase();
+
+        //create an empty ArrayList that we can add a job to provided one of the job properties contains the value (search term)
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        //here, we loop through all the jobs in the data so we can check one by one if a property contains the search term.
+        for (HashMap<String, String> oneJob : allJobs) {
+            //here, we loop through all the entries in the hashmap representing the job to see if the property contains the search term.
+            for (Map.Entry<String, String> jobProps : oneJob.entrySet()) {
+                //if we find the value in one of the properties, we add the job, then break out of the Map.Entry for-loop so we do not add the same thing
+                // twice.
+                //
+                //Furthermore, we lowercase the values of the properties to force case insensitivity.
+                if (jobProps.getValue().toLowerCase().contains(value)) {
+                    jobs.add(oneJob);
+                    break;
+                }
+                //if we do not find the search term, we do not add it; we do nothing and go to the next job in the arraylist.
+            }
+        }
+        //When we finish looking through all the jobs in the data, we return the jobs that we find satisfy the condition.
+        return jobs;
+    }
     /**
      * Read in data from a CSV file and store it in a list
      */
